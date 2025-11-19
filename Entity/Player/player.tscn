@@ -1,0 +1,155 @@
+[gd_scene load_steps=14 format=3 uid="uid://dq2ln1vtxsnd2"]
+
+[ext_resource type="Texture2D" uid="uid://bn7uyncly2iql" path="res://Ressources/Assets/sprites/knight.png" id="1_3eola"]
+[ext_resource type="Script" uid="uid://dwf00c2vhh20y" path="res://Entity/Player/player.gd" id="1_x1f5c"]
+[ext_resource type="Script" uid="uid://lgybl2o6whu3" path="res://Entity/Player/States/idle.gd" id="3_viyt1"]
+[ext_resource type="Script" uid="uid://dyblpjlkn5xun" path="res://Entity/Player/States/jump.gd" id="4_jksyu"]
+[ext_resource type="Script" uid="uid://co3gsgr76shwd" path="res://Entity/Player/States/run.gd" id="4_viyt1"]
+[ext_resource type="Script" uid="uid://n7c72jhx0pkn" path="res://Entity/Player/States/fall.gd" id="5_ub5qt"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0bb2n"]
+size = Vector2(10, 18.263226)
+
+[sub_resource type="Animation" id="Animation_fkybt"]
+resource_name = "Fall"
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [58]
+}
+
+[sub_resource type="Animation" id="Animation_cvnsp"]
+resource_name = "Idle"
+length = 0.6
+loop_mode = 1
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.15, 0.3, 0.45),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="Animation" id="Animation_vgqql"]
+resource_name = "Jump"
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [42]
+}
+
+[sub_resource type="Animation" id="Animation_6t5aa"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_x3wgy"]
+resource_name = "Run"
+length = 0.48
+loop_mode = 1
+step = 0.02
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.04, 0.08, 0.120000005, 0.16, 0.2, 0.24, 0.28, 0.32, 0.36, 0.4, 0.44),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_vgqql"]
+_data = {
+&"Fall": SubResource("Animation_fkybt"),
+&"Idle": SubResource("Animation_cvnsp"),
+&"Jump": SubResource("Animation_vgqql"),
+&"RESET": SubResource("Animation_6t5aa"),
+&"Run": SubResource("Animation_x3wgy")
+}
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_x1f5c")
+coyote_time = 0.1
+
+[node name="States" type="Node" parent="."]
+
+[node name="Idle" type="Node" parent="States"]
+unique_name_in_owner = true
+script = ExtResource("3_viyt1")
+
+[node name="Run" type="Node" parent="States"]
+unique_name_in_owner = true
+script = ExtResource("4_viyt1")
+
+[node name="Jump" type="Node" parent="States"]
+unique_name_in_owner = true
+script = ExtResource("4_jksyu")
+
+[node name="Fall" type="Node" parent="States"]
+unique_name_in_owner = true
+script = ExtResource("5_ub5qt")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+position = Vector2(0, -10)
+scale = Vector2(1, 1.0151515)
+texture = ExtResource("1_3eola")
+hframes = 8
+vframes = 8
+
+[node name="Collider" type="CollisionShape2D" parent="."]
+position = Vector2(0, -6.954325)
+shape = SubResource("RectangleShape2D_0bb2n")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_vgqql")
+}
+
+[node name="Camera" type="Camera2D" parent="."]
+zoom = Vector2(3, 3)
+position_smoothing_enabled = true
+
+[node name="Label" type="Label" parent="."]
+offset_left = -21.0
+offset_top = -43.0
+offset_right = 21.0
+offset_bottom = -20.0
+theme_override_font_sizes/font_size = 10
+text = "label"
+horizontal_alignment = 1
+vertical_alignment = 1
