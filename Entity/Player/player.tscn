@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://dq2ln1vtxsnd2"]
+[gd_scene load_steps=17 format=3 uid="uid://dq2ln1vtxsnd2"]
 
 [ext_resource type="Texture2D" uid="uid://bn7uyncly2iql" path="res://Ressources/Assets/sprites/knight.png" id="1_3eola"]
 [ext_resource type="Script" uid="uid://dwf00c2vhh20y" path="res://Entity/Player/player.gd" id="1_x1f5c"]
@@ -6,9 +6,32 @@
 [ext_resource type="Script" uid="uid://dyblpjlkn5xun" path="res://Entity/Player/States/jump.gd" id="4_jksyu"]
 [ext_resource type="Script" uid="uid://co3gsgr76shwd" path="res://Entity/Player/States/run.gd" id="4_viyt1"]
 [ext_resource type="Script" uid="uid://n7c72jhx0pkn" path="res://Entity/Player/States/fall.gd" id="5_ub5qt"]
+[ext_resource type="Script" uid="uid://cepeihfuk7m83" path="res://Entity/Player/States/crouch.gd" id="6_ub5qt"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_0bb2n"]
-size = Vector2(10, 18.263226)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_jksyu"]
+radius = 5.0
+height = 15.90865
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ub5qt"]
+radius = 5.0
+height = 10.0
+
+[sub_resource type="Animation" id="Animation_ub5qt"]
+resource_name = "Crouch"
+length = 0.1
+step = 0.05
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05),
+"transitions": PackedFloat32Array(1, 1),
+"update": 1,
+"values": [41, 46]
+}
 
 [sub_resource type="Animation" id="Animation_fkybt"]
 resource_name = "Fall"
@@ -23,7 +46,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [58]
+"values": [41]
 }
 
 [sub_resource type="Animation" id="Animation_cvnsp"]
@@ -57,7 +80,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [42]
+"values": [58]
 }
 
 [sub_resource type="Animation" id="Animation_6t5aa"]
@@ -95,6 +118,7 @@ tracks/0/keys = {
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_vgqql"]
 _data = {
+&"Crouch": SubResource("Animation_ub5qt"),
 &"Fall": SubResource("Animation_fkybt"),
 &"Idle": SubResource("Animation_cvnsp"),
 &"Jump": SubResource("Animation_vgqql"),
@@ -103,8 +127,9 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody2D"]
+collision_layer = 0
+collision_mask = 3
 script = ExtResource("1_x1f5c")
-coyote_time = 0.1
 
 [node name="States" type="Node" parent="."]
 
@@ -124,6 +149,10 @@ script = ExtResource("4_jksyu")
 unique_name_in_owner = true
 script = ExtResource("5_ub5qt")
 
+[node name="Crouch" type="Node" parent="States"]
+unique_name_in_owner = true
+script = ExtResource("6_ub5qt")
+
 [node name="Sprite" type="Sprite2D" parent="."]
 position = Vector2(0, -10)
 scale = Vector2(1, 1.0151515)
@@ -131,9 +160,15 @@ texture = ExtResource("1_3eola")
 hframes = 8
 vframes = 8
 
-[node name="Collider" type="CollisionShape2D" parent="."]
-position = Vector2(0, -6.954325)
-shape = SubResource("RectangleShape2D_0bb2n")
+[node name="CollisionStand" type="CollisionShape2D" parent="."]
+position = Vector2(0, -6)
+shape = SubResource("CapsuleShape2D_jksyu")
+
+[node name="CollisionCrouch" type="CollisionShape2D" parent="."]
+position = Vector2(0, -3)
+rotation = 1.5707964
+shape = SubResource("CapsuleShape2D_ub5qt")
+disabled = true
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {
@@ -153,3 +188,7 @@ theme_override_font_sizes/font_size = 10
 text = "label"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="OneWayPlatformRayCast" type="RayCast2D" parent="."]
+target_position = Vector2(0, 4)
+collision_mask = 2

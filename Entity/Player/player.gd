@@ -3,19 +3,28 @@ class_name Player extends CharacterBody2D
 const DEBUG_JUMP_INDICATOR = preload("uid://drc2howp1ywlo")
 
 #region /// On ready variables
+@onready var sprite: Sprite2D = $Sprite
+@onready var collision_stand: CollisionShape2D = $CollisionStand
+@onready var collision_crouch: CollisionShape2D = $CollisionCrouch
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
+@onready var one_way_platform_ray_cast: RayCast2D = $OneWayPlatformRayCast
 #endregion
 
 #region /// Export variables
+@export_group("Player speed")
 @export var move_speed: float = 120
 @export var jump_velocity: float = 400.0
+
+@export_group("Player feeling")
 @export var jump_buffer_time: float = 0.1
+@export var coyote_time: float = 0.115
+@export var deceleration_rate: float = 10
+
+@export_group("Gravity")
 @export var gravity: float = 800
 @export var gravity_multiplier: float = 1.0
 @export var fall_gravity_multiplier: float = 1.165
 @export var air_speed: float = 1.2
-@export var coyote_time: float = 0.115
-
 #endregion
 
 #region /// State machine variables
@@ -87,10 +96,18 @@ func change_state(new_state: PlayerState) -> void:
 	pass
 
 func update_direction() -> void:
-	#var prev_direction: Vector2 = direction
+
+	var prev_direction: Vector2 = direction
 	var x_axis = Input.get_axis("KeyLeft","KeyRight")
 	var y_axis = Input.get_axis("KeyUp","KeyDown")
 	direction = Vector2 (x_axis, y_axis)
+	
+	if prev_direction.x != direction.x:
+		if direction.x < 0:
+			sprite.flip_h = true
+		if direction.x > 0:
+			sprite.flip_h = false
+	
 	pass
 
 func add_debug_indicator(color: Color = Color.RED) -> void:

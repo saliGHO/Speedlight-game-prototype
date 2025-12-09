@@ -15,7 +15,7 @@ func enter() -> void :
 	initial_gravity_multiplier = player.gravity_multiplier
 	player.gravity_multiplier = player.fall_gravity_multiplier
 	if player.previous_state == jump:
-		coyote_timer = player.coyote_time
+		coyote_timer = 0
 	else:
 		coyote_timer = player.coyote_time
 	pass
