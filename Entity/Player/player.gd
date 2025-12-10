@@ -18,7 +18,9 @@ const DEBUG_JUMP_INDICATOR = preload("uid://drc2howp1ywlo")
 @export_group("Player feeling")
 @export var jump_buffer_time: float = 0.1
 @export var coyote_time: float = 0.115
-@export var deceleration_rate: float = 10
+@export var acceleration_rate: float = 14
+@export var deceleration_rate: float = 12
+@export var crouch_deceleration_rate: float = 6
 
 @export_group("Gravity")
 @export var gravity: float = 800

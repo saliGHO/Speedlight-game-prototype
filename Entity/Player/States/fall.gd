@@ -22,8 +22,9 @@ func enter() -> void :
 
 
 #What happends when we exit this state?
-func exit() -> void:
-	player.gravity_multiplier = initial_gravity_multiplier
+func exit() -> void:	
+	if player.one_way_platform_ray_cast.is_colliding() == false:
+		player.gravity_multiplier = initial_gravity_multiplier
 	pass
 
 
@@ -34,7 +35,7 @@ func handle_input(event: InputEvent) -> PlayerState:
 				return jump
 		else:
 			jump_buffer_timer = player.jump_buffer_time
-	
+			
 	return next_state
 
 
@@ -47,10 +48,21 @@ func process(delta: float) -> PlayerState:
 
 #What happens each physics_process tick in this state?
 func physics_process(_delta: float) -> PlayerState:
+	
+	if Input.is_action_pressed("KeyCrouch"):
+		if player.one_way_platform_ray_cast.is_colliding() == true:
+			player.position.y += 4
+			return fall
+			
 	if player.is_on_floor():
 		player.add_debug_indicator(Color.RED)
 		if jump_buffer_timer > 0 :
 			return jump
 		return idle
-	player.velocity.x = player.direction.x * player.move_speed * player.air_speed
+		
+	if player.previous_state == crouch :
+		player.velocity.x *= 1
+	else:
+		player.velocity.x = player.direction.x * player.move_speed * player.air_speed
+		
 	return next_state
