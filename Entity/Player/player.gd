@@ -11,6 +11,9 @@ const DEBUG_JUMP_INDICATOR = preload("uid://drc2howp1ywlo")
 #endregion
 
 #region /// Export variables
+@export_group("Player ability")
+@export var is_crouching = false
+
 @export_group("Player speed")
 @export var move_speed: float = 120
 @export var jump_velocity: float = 400.0
@@ -39,6 +42,7 @@ var previous_state: PlayerState:
 
 #region /// Stantard variables
 var direction: Vector2 = Vector2.ZERO
+var KeyDown_is_held = false
 #endregion
 
 
@@ -60,6 +64,13 @@ func _physics_process(delta: float) -> void:
 	velocity.y += gravity * delta * gravity_multiplier
 	move_and_slide()
 	change_state(current_state.physics_process(delta))
+	
+	if Input.is_action_pressed("KeyDown"):
+		KeyDown_is_held = true
+		
+	if Input.is_action_just_released("KeyDown"):
+		KeyDown_is_held = false
+	
 	pass
 
 func initialize_state() -> void:
@@ -110,6 +121,7 @@ func update_direction() -> void:
 		if direction.x > 0:
 			sprite.flip_h = false
 	
+		
 	pass
 
 func add_debug_indicator(color: Color = Color.RED) -> void:

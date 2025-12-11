@@ -1,6 +1,5 @@
 class_name PlayerStateIdle extends PlayerState
 
-
 #What happens when this state is initialized?
 func init() -> void:
 	pass

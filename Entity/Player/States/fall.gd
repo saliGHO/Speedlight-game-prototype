@@ -18,13 +18,13 @@ func enter() -> void :
 		coyote_timer = 0
 	else:
 		coyote_timer = player.coyote_time
+		
 	pass
 
 
 #What happends when we exit this state?
 func exit() -> void:	
-	if player.one_way_platform_ray_cast.is_colliding() == false:
-		player.gravity_multiplier = initial_gravity_multiplier
+	player.gravity_multiplier = initial_gravity_multiplier
 	pass
 
 
@@ -35,7 +35,7 @@ func handle_input(event: InputEvent) -> PlayerState:
 				return jump
 		else:
 			jump_buffer_timer = player.jump_buffer_time
-			
+	
 	return next_state
 
 
@@ -49,11 +49,11 @@ func process(delta: float) -> PlayerState:
 #What happens each physics_process tick in this state?
 func physics_process(_delta: float) -> PlayerState:
 	
-	if Input.is_action_pressed("KeyCrouch"):
+	if player.KeyDown_is_held == true:
 		if player.one_way_platform_ray_cast.is_colliding() == true:
 			player.position.y += 4
-			return fall
-			
+			return fall 
+	
 	if player.is_on_floor():
 		player.add_debug_indicator(Color.RED)
 		if jump_buffer_timer > 0 :
