@@ -50,9 +50,9 @@ func process(delta: float) -> PlayerState:
 func physics_process(_delta: float) -> PlayerState:
 	
 	if player.KeyDown_is_held == true:
-		if player.one_way_platform_ray_cast.is_colliding() == true:
-			player.position.y += 4
-			return fall 
+		player.set_collision_mask_value(2,false)
+	else:
+		player.set_collision_mask_value(2,true)
 	
 	if player.is_on_floor():
 		player.add_debug_indicator(Color.RED)

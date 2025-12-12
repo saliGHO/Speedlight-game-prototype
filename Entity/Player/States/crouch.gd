@@ -26,17 +26,18 @@ func handle_input(event: InputEvent) -> PlayerState:
 	if event.is_action_pressed("KeyJump"):
 		return jump
 		
-	if event.is_action_pressed("KeyDown"):
-		if player.one_way_platform_ray_cast.is_colliding() == true:
-			player.position.y += 4
-			return fall
-		
 	return next_state
 
 #What happens each process tick in this state?
 func process(_delta: float) -> PlayerState:
 	if Input.is_action_just_released("KeyCrouch"):
 		return idle
+		
+	if player.KeyDown_is_held == true:
+		player.set_collision_mask_value(2,false)
+	else:
+		player.set_collision_mask_value(2,true)
+		
 	return next_state
 
 
