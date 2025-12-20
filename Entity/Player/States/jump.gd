@@ -1,7 +1,6 @@
 class_name PlayerStateJump extends PlayerState
 
 
-
 #What happens when this state is initialized?
 func init() -> void:
 	pass
@@ -10,14 +9,15 @@ func init() -> void:
 #What happens when we enter this state?
 func enter() -> void :
 	player.animation_player.play("Jump")
-	player.add_debug_indicator(Color.LIGHT_GREEN)
+	player.animation_player.pause()
+	#player.add_debug_indicator(Color.LIGHT_GREEN)
 	player.velocity.y = -player.jump_velocity
 	pass
 
 
 #What happends when we exit this state?
 func exit() -> void:
-	player.add_debug_indicator(Color.YELLOW)
+	#player.add_debug_indicator(Color.YELLOW)
 	pass
 
 
@@ -32,12 +32,12 @@ func handle_input(event: InputEvent) -> PlayerState:
 
 #What happens each process tick in this state?
 func process(_delta: float) -> PlayerState:
+	set_jump_frame()
 	return next_state
 
 
 #What happens each physics_process tick in this state?
 func physics_process(_delta: float) -> PlayerState:
-	
 	if player.is_on_floor():
 		return idle
 	elif player.velocity.y >= 0:
@@ -46,3 +46,8 @@ func physics_process(_delta: float) -> PlayerState:
 	player.velocity.x = player.direction.x * player.move_speed
 	
 	return next_state
+
+func set_jump_frame() -> void:
+	var frame: float = remap(player.velocity.y, -player.jump_velocity, 0.0, 0.0, 0.5)
+	player.animation_player.seek(frame, true)
+	pass

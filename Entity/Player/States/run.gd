@@ -1,7 +1,5 @@
 class_name PlayerStateRun extends PlayerState
 
-var small_jump_timer: float = 0
-
 #What happens when this state is initialized?
 func init() -> void:
 	pass
@@ -19,7 +17,7 @@ func exit() -> void:
 
 
 #What happens when an input is pressed?
-func handle_input(event: InputEvent) -> PlayerState:
+func handle_input(event: InputEvent) -> PlayerState:	
 	if event.is_action_pressed("KeyJump"):
 		return jump
 		
@@ -30,24 +28,20 @@ func handle_input(event: InputEvent) -> PlayerState:
 func process(_delta: float) -> PlayerState:
 	if player.direction.x == 0:
 		return idle
-	elif Input.is_action_just_pressed("KeyCrouch"):
+	elif Input.is_action_pressed("KeyCrouch"):
 		return crouch
+	
 	return next_state
 
 
 #What happens each physics_process tick in this state?
 func physics_process(_delta: float) -> PlayerState:
+	if player.direction.x == 0:
+		return idle
 	
-	if player.KeyDown_is_held == true:
-		player.set_collision_mask_value(2,false)
-	else:
-		player.set_collision_mask_value(2,true)
-	
-	if player.direction.x != 0:
-		player.velocity.x = move_toward(player.velocity.x, player.direction.x * player.move_speed, player.acceleration_rate)
-	else:
-		player.velocity.x = move_toward(player.velocity.x, player.direction.x * player.move_speed, player.deceleration_rate)
-		
 	if player.is_on_floor() == false:
 		return fall
+	
+	player.update_velocity(player.direction.x * player.move_speed, player.acceleration)
+	
 	return next_state

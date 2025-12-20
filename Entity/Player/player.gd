@@ -3,33 +3,44 @@ class_name Player extends CharacterBody2D
 const DEBUG_JUMP_INDICATOR = preload("uid://drc2howp1ywlo")
 
 #region /// On ready variables
+
 @onready var sprite: Sprite2D = $Sprite
 @onready var collision_stand: CollisionShape2D = $CollisionStand
 @onready var collision_crouch: CollisionShape2D = $CollisionCrouch
 @onready var animation_player: AnimationPlayer = $AnimationPlayer
 @onready var one_way_platform_ray_cast: RayCast2D = $OneWayPlatformRayCast
+
+@onready var idle: PlayerStateIdle = %Idle
+@onready var run: PlayerStateRun = %Run
+@onready var jump: PlayerStateJump = %Jump
+@onready var fall: PlayerStateFall = %Fall
+@onready var crouch: PlayerStateCrouch = %Crouch
 #endregion
 
 #region /// Export variables
-@export_group("Player ability")
-@export var is_crouching = false
 
-@export_group("Player speed")
-@export var move_speed: float = 120
+@export_group("Player velocity setting")
+@export var move_speed: float = 80
+@export var sprint_move_speed: float = 120
+@export var acceleration: float = 14
+@export var deceleration: float = 12
+@export var crouch_deceleration_rate: float = 6
+
+@export_group("Player jump settings")
 @export var jump_velocity: float = 400.0
-
-@export_group("Player feeling")
+@export var max_fall_velocity: float = 400
 @export var jump_buffer_time: float = 0.1
 @export var coyote_time: float = 0.115
-@export var acceleration_rate: float = 14
-@export var deceleration_rate: float = 12
-@export var crouch_deceleration_rate: float = 6
 
 @export_group("Gravity")
 @export var gravity: float = 800
 @export var gravity_multiplier: float = 1.0
 @export var fall_gravity_multiplier: float = 1.165
 @export var air_speed: float = 1.2
+
+@export_group("One way platforms")
+@export var drop_await_idle: float = 0.1
+@export var drop_await_fall: float = 0.15
 #endregion
 
 #region /// State machine variables
@@ -42,7 +53,7 @@ var previous_state: PlayerState:
 
 #region /// Stantard variables
 var direction: Vector2 = Vector2.ZERO
-var KeyDown_is_held = false
+var crouch_while_falling = false
 #endregion
 
 
@@ -52,26 +63,31 @@ func _ready() -> void:
 	pass
 
 func _unhandled_input(event: InputEvent) -> void:
-	change_state(current_state.handle_input(event))
+	@warning_ignore("redundant_await")
+	change_state(await current_state.handle_input(event))
+	
+	if Input.is_action_pressed("KeyCrouch") && current_state == fall or current_state == jump:
+		crouch_while_falling = true
+	if Input.is_action_just_released("KeyCrouch") or Input.is_action_just_released("KeyJump"):
+		crouch_while_falling = false
+	pass
 
 func _process(delta: float) -> void:
 	update_direction()
-	change_state(current_state.process(delta))
+	@warning_ignore("redundant_await")
+	change_state(await current_state.process(delta))
 	pass
-
 
 func _physics_process(delta: float) -> void:
 	velocity.y += gravity * delta * gravity_multiplier
+	velocity.y = clampf(velocity.y, -1000.0, max_fall_velocity)
 	move_and_slide()
 	change_state(current_state.physics_process(delta))
 	
-	if Input.is_action_pressed("KeyDown"):
-		KeyDown_is_held = true
-		
-	if Input.is_action_just_released("KeyDown"):
-		KeyDown_is_held = false
-	
 	pass
+
+func update_velocity(_velocity: float, _acceleration: float) -> void:
+	velocity.x = move_toward(velocity.x,_velocity, _acceleration)
 
 func initialize_state() -> void:
 	states = []
@@ -109,7 +125,6 @@ func change_state(new_state: PlayerState) -> void:
 	pass
 
 func update_direction() -> void:
-
 	var prev_direction: Vector2 = direction
 	var x_axis = Input.get_axis("KeyLeft","KeyRight")
 	var y_axis = Input.get_axis("KeyUp","KeyDown")
@@ -124,11 +139,11 @@ func update_direction() -> void:
 		
 	pass
 
-func add_debug_indicator(color: Color = Color.RED) -> void:
-	var d : Node2D = DEBUG_JUMP_INDICATOR.instantiate()
-	get_tree().root.add_child(d)
-	d.global_position = global_position
-	d.modulate = color
-	await get_tree().create_timer(3.0).timeout
-	d.queue_free()
-	pass
+#func add_debug_indicator(color: Color = Color.RED) -> void:
+	#var d : Node2D = DEBUG_JUMP_INDICATOR.instantiate()
+	#get_tree().root.add_child(d)
+	#d.global_position = global_position
+	#d.modulate = color
+	#await get_tree().create_timer(3.0).timeout
+	#d.queue_free()
+	#pass
